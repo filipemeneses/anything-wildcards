@@ -51,11 +51,15 @@ const scrapCategoryWords = async (url) => {
   )).get();
 };
 
+const cleanUp = (categoriesWithWords) => categoriesWithWords.filter((
+  (category) => category && !category.name.includes('fry_word')
+));
+
 const scrapAll = async () => {
   const scrappedContent = await fallbackReadFile(CATEGORIES_WORDS_PATH);
   if (scrappedContent) {
     console.log(`"${CATEGORIES_WORDS_PATH}" is not empty.\nSkipping scrap ...`);
-    return;
+    return cleanUp(JSON.parse(scrappedContent));
   }
 
   const categories = await cachedScrapCategories(true);
@@ -68,6 +72,8 @@ const scrapAll = async () => {
   );
 
   await fs.writeFile(CATEGORIES_WORDS_PATH, JSON.stringify(words, null, 2));
+
+  return cleanUp(words);
 };
 
 const enchantedlearning = {
